@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv/
+.venv-*/
+mlruns/
+__pycache__/
+*.py[cod]
+data/
+logs/
+artifacts/
+.pytest_cache/
+*.egg-info/
+examples/AI_Procurement_Contracts.xlsx

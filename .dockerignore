@@ -1,0 +1,12 @@
+.env
+.venv
+.venv-*
+__pycache__
+*.py[cod]
+.pytest_cache
+.ipynb_checkpoints
+data
+logs
+artifacts
+mlruns
+worldbank_procurement_demo.egg-info

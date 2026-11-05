@@ -1,0 +1,10 @@
+Illustrative synthetic retrospective document. This file is not a World Bank publication.
+
+Section 1: Executive summary
+This example demonstrates source-grounded retrieval for an imaginary water project.
+
+Section 2: Procurement lessons
+The imaginary package was rebid after the initial market assessment found limited supplier participation. Use this sentence only to test retrieval and citation behavior.
+
+Section 3: Implementation rating
+For the synthetic example, the fictional project rating for 2023 is satisfactory.

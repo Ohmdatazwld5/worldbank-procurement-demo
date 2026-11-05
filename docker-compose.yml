@@ -1,0 +1,77 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      API_TOKENS_JSON: '{"demo-admin":{"subject":"demo-admin","roles":["admin"],"project_ids":["*"]},"demo-analyst":{"subject":"demo-analyst","roles":["analyst"],"project_ids":["P001","P002","P005"]}}'
+      DOCUMENT_MANIFEST_PATH: /app/examples/document_manifest.json
+      DOCUMENTS_DIR: /app/examples/documents
+      EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+      HF_HOME: /models/huggingface
+      PROCUREMENT_DATA_PATH: /app/examples/procurement_demo.csv
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./data:/app/data
+      - huggingface-cache:/models/huggingface
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    command: airflow standalone
+    environment:
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      CATALOG_MODE: hive
+      DELTA_LAKE_ROOT: /opt/project/data/local_lakehouse
+      DOCUMENT_MANIFEST_PATH: /opt/project/examples/document_manifest.json
+      DOCUMENTS_DIR: /opt/project/examples/documents
+      EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+      HIVE_METASTORE_DB_PATH: /opt/project/data/hive-metastore
+      PROCUREMENT_DATA_PATH: /opt/project/examples/procurement_demo.csv
+      PYTHONPATH: /opt/project
+      SPARK_SQL_WAREHOUSE_DIR: /opt/project/data/spark-warehouse
+      WORLD_BANK_COUNTRIES: IND
+      WORLD_BANK_END_YEAR: "2025"
+      WORLD_BANK_START_YEAR: "2020"
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - airflow-home:/opt/airflow
+      - ./airflow/dags:/opt/project/airflow/dags:ro
+      - ./data:/opt/project/data
+      - ./examples:/opt/project/examples:ro
+    restart: unless-stopped
+
+  delta-smoke:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    command: python -m worldbank_demo_backend.local_smoke
+    environment:
+      CATALOG_MODE: hive
+      DELTA_LAKE_ROOT: /opt/project/data/local_lakehouse
+      HIVE_METASTORE_DB_PATH: /opt/project/data/hive-metastore
+      PYTHONPATH: /opt/project
+      SPARK_SQL_WAREHOUSE_DIR: /opt/project/data/spark-warehouse
+    profiles:
+      - smoke
+    volumes:
+      - ./data:/opt/project/data
+
+volumes:
+  airflow-home:
+  huggingface-cache:

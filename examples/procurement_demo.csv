@@ -1,0 +1,6 @@
+project_id,contract_id,sector_code,project_year,country_code,planned_days,actual_days,amendment_count,outcome,procurement_method,project_budget
+P001,C001,Transport,2022,IND,120,150,2,Completed,Open International,1200000
+P002,C002,Health,2023,IND,90,135,3,Amended,Open National,800000
+P003,C003,Transport,2024,USA,100,110,1,Completed,Open International,2000000
+P004,C004,Energy,2024,CHN,150,150,0,Completed,Open International,5000000
+P005,C005,Water,2023,IND,80,125,2,Rebid,Open National,900000

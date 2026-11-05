@@ -1,0 +1,38 @@
+{
+  "documents": [
+    {
+      "file": "illustrative_icr.txt",
+      "document_id": "SYN-ICR-001",
+      "document_type": "ICR",
+      "project_id": "P005",
+      "sector_code": "Water",
+      "document_year": 2025,
+      "effective_date": "2025-03-01",
+      "confidence_tier": 1,
+      "claim_annotations": [
+        {
+          "section_title": "Section 3: Implementation rating",
+          "claim_key": "implementation_rating_2023",
+          "claim_value": "satisfactory"
+        }
+      ]
+    },
+    {
+      "file": "illustrative_isr.txt",
+      "document_id": "SYN-ISR-001",
+      "document_type": "ISR",
+      "project_id": "P005",
+      "sector_code": "Water",
+      "document_year": 2023,
+      "effective_date": "2023-08-15",
+      "confidence_tier": 2,
+      "claim_annotations": [
+        {
+          "section_title": "Section 3: Implementation rating",
+          "claim_key": "implementation_rating_2023",
+          "claim_value": "moderately satisfactory"
+        }
+      ]
+    }
+  ]
+}

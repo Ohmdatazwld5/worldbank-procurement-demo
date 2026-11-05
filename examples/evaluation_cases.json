@@ -1,0 +1,9 @@
+[
+  {
+    "project_id": "P005",
+    "question": "What procurement lesson could matter for a new water package?",
+    "expected_status": "GROUNDED",
+    "expected_document_ids": ["SYN-ICR-001"],
+    "expected_citations": []
+  }
+]

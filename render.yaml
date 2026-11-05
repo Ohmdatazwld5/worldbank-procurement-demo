@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: procurement-intelligence-demo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-web.txt
+    startCommand: uvicorn worldbank_demo_backend.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.4
+      - key: API_TOKENS_JSON
+        sync: false
+      - key: PROCUREMENT_DATA_PATH
+        value: examples/procurement_demo.csv
+      - key: DOCUMENTS_DIR
+        value: examples/documents
+      - key: DOCUMENT_MANIFEST_PATH
+        value: examples/document_manifest.json
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      - key: HF_HUB_DISABLE_SYMLINKS_WARNING
+        value: "1"
+      - key: APP_LOG_PATH
+        value: /tmp/logs/application.jsonl
+      - key: FEEDBACK_JSONL_PATH
+        value: /tmp/feedback.jsonl

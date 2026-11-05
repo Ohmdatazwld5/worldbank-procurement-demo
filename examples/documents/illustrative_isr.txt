@@ -1,0 +1,10 @@
+Illustrative synthetic supervision document. This file is not a World Bank publication.
+
+Section 1: Interim supervision
+This example demonstrates time-scoped supervision evidence for an imaginary project.
+
+Section 2: Contract management
+The fictional project records an interim concern about ambiguous technical specifications. This text is only a parser and retrieval fixture.
+
+Section 3: Implementation rating
+For the synthetic example, the fictional project rating for 2023 is moderately satisfactory.

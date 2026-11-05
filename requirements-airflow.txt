@@ -1,0 +1,2 @@
+# Install Apache Airflow with the constraints file for the chosen Airflow/Python version.
+apache-airflow>=2.9,<4
