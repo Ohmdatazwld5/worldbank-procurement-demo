@@ -15,6 +15,10 @@ class WebUiTests(unittest.TestCase):
         content = Path(response.path).read_text(encoding="utf-8")
         self.assertIn('id="query-form"', content)
         self.assertIn('fetch("/v1/query"', content)
+        self.assertIn('authorizedFetch("/v1/demo/overview")', content)
+        self.assertIn('fetch(url, {', content)
+        self.assertIn('id="feedback-button"', content)
+        self.assertIn('id="context-sector"', content)
         self.assertIn("fictional test fixtures", content)
 
 

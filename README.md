@@ -306,6 +306,14 @@ and labels the bundled synthetic data as fictional. Enter the configured bearer
 token in the page (the local demo token is prefilled). The API documentation
 remains available at `http://127.0.0.1:8000/docs`.
 
+The page also has a protected **Load system overview** panel. An analyst/admin
+token displays the running service's source counts, loaded document/chunk counts,
+entity-resolution links, configured models, storage mode, feedback count, and
+which pipeline/monitoring services are not running. The Q&A form accepts
+optional country/sector/year/planned-duration context for a new package. After
+an answer, a reviewer can submit a rating and note; feedback is flagged for human
+review and is never automatically treated as a training label.
+
 Example existing-project query:
 
 ```powershell
@@ -327,6 +335,24 @@ only when registered models are configured; otherwise risk prediction abstains.
 The sample admin token in `.env.example` is public demo text. Replace it before
 any network exposure. The API role map is a local demonstration; production
 should validate OIDC/JWT identity and enforce matching cloud data/object-store ACLs.
+
+## What the Render demo actually runs
+
+The Render Blueprint uses the paid `1c-2g` compute plan selected for the demo.
+Pushing a change to the Blueprint can sync its declared plan, so keep that value
+aligned with the plan you intend to pay for. This web service loads its configured
+feed and documents at startup, serves LangGraph retrieval, and stores the serving
+copy in in-memory DuckDB. Its bundled input files are fictional examples.
+
+The Render web service does **not** run the Airflow scheduler or PySpark/Delta
+ETL, does not provision a persistent lakehouse/catalog, and does not run FLAML
+training, Evidently reports, or Grafana. Those modules and the local Docker/Airflow
+workflow are in the repository; the status panel marks them inactive unless
+their required inputs/services are separately configured. The Render `/tmp`
+feedback and log paths are ephemeral. The panel displays KPI targets as targets,
+not observed results. To demonstrate real outcomes, supply reviewed project-level
+procurement records and authoritative reports, configure durable shared storage
+and the external workflow/monitoring services, then run human-reviewed evaluation.
 
 ## Workflows, evaluation, monitoring, and feedback
 

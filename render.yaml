@@ -2,7 +2,7 @@ services:
   - type: web
     name: procurement-intelligence-demo
     runtime: python
-    plan: free
+    plan: 1c-2g
     buildCommand: pip install -r requirements-web.txt
     startCommand: uvicorn worldbank_demo_backend.api:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health

@@ -159,6 +159,28 @@
       .item-text { white-space: pre-wrap; }
       .item-source { display: block; margin-top: 7px; color: var(--green-dark); font-size: 11px; }
       .empty-state { color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .overview-card { margin-bottom: 20px; }
+      .overview-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center; }
+      .overview-heading h2 { margin: 0; }
+      .overview-status { min-height: 20px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+      .overview-status[data-state="error"] { color: #a83232; }
+      .metric-grid, .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 15px; }
+      .metric, .feature { border: 1px solid var(--border); border-radius: 9px; padding: 12px; background: #fbfcfb; }
+      .metric-label, .feature-title { display: block; font-size: 12px; font-weight: 750; }
+      .metric-value { display: block; margin-top: 6px; font-size: 22px; font-weight: 750; }
+      .feature-state { display: inline-block; margin-top: 8px; border-radius: 999px; padding: 4px 8px; color: #46564f; background: #edf1ee; font-size: 10px; font-weight: 750; text-transform: uppercase; }
+      .feature[data-state="active"] .feature-state { color: #145c43; background: #e6f4ec; }
+      .overview-section { margin-top: 22px; }
+      .overview-section h3 { margin: 0 0 8px; font-size: 14px; }
+      .overview-copy { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+      .overview-copy + .overview-copy { margin-top: 6px; }
+      .inline-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+      details { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+      summary { color: var(--green-dark); cursor: pointer; font-size: 13px; font-weight: 700; }
+      .feedback-card { margin-top: 20px; }
+      .feedback-card[hidden] { display: none; }
+      .feedback-card textarea { min-height: 70px; }
+      .kpi-grid { display: grid; gap: 6px; padding-left: 18px; color: var(--muted); font-size: 12px; line-height: 1.5; }
       footer { margin-top: 20px; color: var(--muted); font-size: 12px; line-height: 1.6; text-align: center; }
 
       @media (max-width: 760px) {
@@ -175,7 +197,7 @@
         <div class="brand-mark" aria-hidden="true">P</div>
         <div>
           <div class="brand-name">ProcureIntel</div>
-          <div class="brand-subtitle">Procurement evidence explorer · local demo</div>
+          <div class="brand-subtitle">Procurement evidence explorer · system demo</div>
         </div>
       </div>
       <div class="health" id="health" data-state="checking" role="status">
@@ -187,17 +209,47 @@
     <main>
       <section class="intro">
         <div class="eyebrow">Evidence-first procurement Q&amp;A</div>
-        <h1>Ask about a project.</h1>
-        <p>Get a source-grounded response from the records and documents configured in this local demo. Review the evidence and citations before interpreting the result.</p>
+        <h1>Procurement intelligence workflow.</h1>
+        <p>Explore how structured records and project documents flow through ingestion, entity resolution, retrieval, risk analysis, governance, evaluation, and feedback. Ask a question and inspect its sources.</p>
         <div class="demo-notice">
-          <strong>Demo data notice:</strong> the default P005 record and attached ICR/ISR documents are fictional test fixtures, not World Bank project evidence. Responses from them demonstrate application behavior only.
+          <strong>Data and deployment notice:</strong> bundled P005 procurement and ICR/ISR examples are fictional test fixtures. The API service does not run Airflow, Spark/Delta ETL, model training, Grafana, or a persistent data store. The status panel distinguishes active features from code that needs separate services and reviewed data.
         </div>
+      </section>
+
+      <section class="card overview-card" aria-labelledby="overview-title">
+        <div class="overview-heading">
+          <h2 id="overview-title">Platform workflow and live capability status</h2>
+          <button id="overview-button" type="button">Load system overview</button>
+        </div>
+        <p class="section-help">Enter an analyst/admin API token in the Q&amp;A form, then load the overview. Counts describe only data loaded by this running service.</p>
+        <p class="overview-status" id="overview-status" role="status" aria-live="polite">Overview not loaded.</p>
+        <div class="metric-grid" id="overview-metrics"></div>
+        <section class="overview-section">
+          <h3>Workflow modules</h3>
+          <div class="feature-grid" id="feature-list"></div>
+        </section>
+        <section class="overview-section">
+          <h3>Loaded data inventory</h3>
+          <div id="source-list"></div>
+        </section>
+        <section class="overview-section">
+          <h3>Knowledge model and document strategy</h3>
+          <div id="knowledge-details"></div>
+        </section>
+        <section class="overview-section">
+          <h3>Storage, monitoring, learning, and evaluation</h3>
+          <div id="operations-details"></div>
+        </section>
+        <section class="overview-section">
+          <h3>Pilot KPI targets (targets, not measured results)</h3>
+          <ul class="kpi-grid" id="kpi-list"></ul>
+        </section>
       </section>
 
       <div class="layout">
         <section class="card" aria-labelledby="ask-title">
           <h2 id="ask-title">Ask a procurement question</h2>
-          <p class="section-help">Enter the project ID and a question. Your API token is sent to this server for authorization and is not saved by this page.</p>
+          <p class="section-help">Enter a project ID and question. Optionally add pre-award package context to retrieve sector/time-related precedents. Your API token is sent to this server and is not saved by this page.</p>
           <form id="query-form">
             <label for="token">API token</label>
             <input id="token" name="token" type="password" placeholder="Enter your configured API token" autocomplete="off" required>
@@ -209,6 +261,31 @@
             <label for="question">Question</label>
             <textarea id="question" name="question" minlength="3" maxlength="4000" required>What procurement lesson should be checked for a new water package?</textarea>
 
+            <details>
+              <summary>New procurement package context (optional)</summary>
+              <p class="field-hint">Fill in country, sector, year, and planned duration to retrieve comparable precedents. Use a new project ID for a new package.</p>
+              <div class="inline-fields">
+                <div>
+                  <label for="context-country">Country code</label>
+                  <input id="context-country" maxlength="3" placeholder="IND">
+                </div>
+                <div>
+                  <label for="context-sector">Sector</label>
+                  <input id="context-sector" maxlength="64" placeholder="Water">
+                </div>
+                <div>
+                  <label for="context-year">Project year</label>
+                  <input id="context-year" type="number" min="1900" max="2200" placeholder="2026">
+                </div>
+                <div>
+                  <label for="context-days">Planned days</label>
+                  <input id="context-days" type="number" min="1" max="10000" step="1" placeholder="180">
+                </div>
+              </div>
+              <label for="context-method">Procurement method (optional)</label>
+              <input id="context-method" maxlength="128" placeholder="Open international competition">
+            </details>
+
             <div class="form-actions">
               <button id="submit-button" type="submit">Ask question</button>
               <a class="text-link" href="/docs" target="_blank" rel="noreferrer">Open API docs</a>
@@ -218,9 +295,9 @@
         </section>
 
         <aside class="card">
-          <h2>How to read this demo</h2>
-          <p class="section-help">The app shows retrieved passages with their source IDs, project-record claims, and the risk method. A “GROUNDED” status means the response passed the app’s citation checks; it does not mean the underlying data is real or independently verified.</p>
-          <p class="empty-state">For real project analysis, replace the sample feed and fictional documents with reviewed, authoritative records. The AI Procurement Contracts workbook is a separate dataset for source/year counts; it is not connected to this Q&amp;A endpoint.</p>
+          <h2>Evidence and guardrails</h2>
+          <p class="section-help">The response displays retrieved passages, citations, conflict status, and the risk method. “GROUNDED” means the application’s citation checks passed; it does not authenticate the underlying source or data.</p>
+          <p class="empty-state">Risk from the bundled fixture is a transparent historical heuristic. Predictive outputs appear only if reviewed, trained, and registered models are configured. The AI Procurement Contracts workbook supports source/year counts; it is not project-level contract history and is not loaded by this Q&amp;A service.</p>
         </aside>
       </div>
 
@@ -239,8 +316,30 @@
           <h3>Retrieved evidence</h3>
           <ul class="item-list" id="evidence"></ul>
         </section>
+        <section class="result-section">
+          <h3>Institutional evidence conflicts</h3>
+          <p class="overview-copy" id="conflict-summary"></p>
+        </section>
       </section>
-      <footer>Local development interface. Not for procurement decisions. Verify source records and citations independently.</footer>
+      <section class="card feedback-card" id="feedback-card" hidden>
+        <h2>Human review feedback</h2>
+        <p class="section-help">Feedback is logged for human review and is not automatically used to train a model.</p>
+        <label for="feedback-rating">How useful was this response?</label>
+        <select id="feedback-rating" aria-label="Response rating">
+          <option value="5">5 — Very useful</option>
+          <option value="4">4 — Useful</option>
+          <option value="3">3 — Neutral</option>
+          <option value="2">2 — Not useful</option>
+          <option value="1">1 — Incorrect or unsafe</option>
+        </select>
+        <label for="feedback-comment">Reviewer note (optional)</label>
+        <textarea id="feedback-comment" maxlength="2000" placeholder="Explain what should be reviewed."></textarea>
+        <div class="form-actions">
+          <button id="feedback-button" type="button">Submit for human review</button>
+          <p class="status" id="feedback-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+      <footer>Demonstration and decision support only. Verify source records and citations independently. No autonomous procurement decisions are made.</footer>
     </main>
 
     <script>
@@ -251,6 +350,10 @@
       const submitButton = byId("submit-button");
       const formStatus = byId("form-status");
       const resultCard = byId("result");
+      const overviewButton = byId("overview-button");
+      const overviewStatus = byId("overview-status");
+      const feedbackCard = byId("feedback-card");
+      let lastResponse = null;
 
       function addTextItem(list, text, source) {
         const item = document.createElement("li");
@@ -279,6 +382,154 @@
         }
       }
 
+      function addMetric(label, value) {
+        const card = document.createElement("div");
+        card.className = "metric";
+        const name = document.createElement("span");
+        name.className = "metric-label";
+        name.textContent = label;
+        const amount = document.createElement("span");
+        amount.className = "metric-value";
+        amount.textContent = String(value);
+        card.append(name, amount);
+        byId("overview-metrics").append(card);
+      }
+
+      function addOverviewText(container, text) {
+        const line = document.createElement("p");
+        line.className = "overview-copy";
+        line.textContent = text;
+        container.append(line);
+      }
+
+      function renderOverview(data) {
+        const metrics = byId("overview-metrics");
+        const featureList = byId("feature-list");
+        const sourceList = byId("source-list");
+        const knowledge = byId("knowledge-details");
+        const operations = byId("operations-details");
+        const kpis = byId("kpi-list");
+        metrics.replaceChildren();
+        featureList.replaceChildren();
+        sourceList.replaceChildren();
+        knowledge.replaceChildren();
+        operations.replaceChildren();
+        kpis.replaceChildren();
+
+        addMetric("Procurement rows", data.data.procurement_records);
+        addMetric("Projects", data.data.projects);
+        addMetric("Parsed documents", data.data.documents);
+        addMetric("Evidence chunks", data.data.evidence_chunks);
+        addMetric("Source classification", data.data.classification.replaceAll("_", " "));
+
+        for (const feature of data.features) {
+          const card = document.createElement("article");
+          card.className = "feature";
+          card.dataset.state = feature.status;
+          const title = document.createElement("span");
+          title.className = "feature-title";
+          title.textContent = feature.title;
+          const state = document.createElement("span");
+          state.className = "feature-state";
+          state.textContent = feature.status.replaceAll("_", " ");
+          const detail = document.createElement("p");
+          detail.className = "overview-copy";
+          detail.textContent = feature.detail;
+          card.append(title, state, detail);
+          featureList.append(card);
+        }
+
+        if (data.data.source_files.length === 0) {
+          addOverviewText(sourceList, "No structured feeds or documents are loaded.");
+        }
+        for (const source of data.data.source_files) {
+          addOverviewText(
+            sourceList,
+            source.file + " — " + source.procurement_records +
+              " procurement rows, " + source.document_chunks + " document chunks."
+          );
+        }
+        addOverviewText(sourceList, data.data.disclaimer);
+
+        addOverviewText(
+          knowledge,
+          "Current links: " + data.knowledge_model.exact_project_links +
+            " exact project-ID links; " + data.knowledge_model.sector_and_temporal_links +
+            " sector/time links."
+        );
+        addOverviewText(knowledge, "Topology: " + data.knowledge_model.topology.join(" · "));
+        addOverviewText(
+          knowledge,
+          "Document strategy: " + data.knowledge_model.document_processing.narrative_chunk_words +
+            "-word narrative chunks with " + data.knowledge_model.document_processing.narrative_overlap_words +
+            "-word overlap; tables keep row groups and repeat headers. " +
+            data.knowledge_model.document_processing.ocr + "."
+        );
+        addOverviewText(knowledge, data.data.disclaimer);
+
+        addOverviewText(
+          operations,
+          "Serving store: " + data.operations.serving_store +
+            "; catalog: " + data.operations.catalog +
+            ". Delta tables configured: " + data.operations.delta_tables_configured +
+            ". Airflow scheduler running in this Render service: " +
+            data.operations.airflow_scheduler_running_with_this_render_service + "."
+        );
+        addOverviewText(
+          operations,
+          "Evaluation cases configured: " + data.operations.evaluation_cases_configured +
+            "; evaluation metrics available: " + data.operations.evaluation_metrics_available +
+            ". Evidently installed: " + data.operations.evidently_installed +
+            "; drift report available: " + data.operations.drift_report_available + "."
+        );
+        addOverviewText(
+          operations,
+          "OpenTelemetry export configured: " + data.operations.otel_export_configured +
+            ". Feedback entries recorded: " + data.operations.feedback_entries_recorded +
+            "; human review required: " + data.operations.feedback_requires_human_review +
+            "; storage: " + data.operations.feedback_storage + "."
+        );
+        for (const [name, target] of Object.entries(data.kpi_targets)) {
+          const item = document.createElement("li");
+          item.textContent = name.replaceAll("_", " ") + ": " + target;
+          kpis.append(item);
+        }
+      }
+
+      async function authorizedFetch(url, options = {}) {
+        const token = byId("token").value.trim();
+        if (!token) throw new Error("Enter an API token first.");
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            ...(options.headers || {}),
+            "Authorization": "Bearer " + token
+          }
+        });
+        const body = await response.json();
+        if (!response.ok) {
+          const detail = typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail || body);
+          throw new Error("Request failed (" + response.status + "): " + detail);
+        }
+        return body;
+      }
+
+      overviewButton.addEventListener("click", async () => {
+        overviewButton.disabled = true;
+        overviewStatus.dataset.state = "";
+        overviewStatus.textContent = "Loading service status…";
+        try {
+          const data = await authorizedFetch("/v1/demo/overview");
+          renderOverview(data);
+          overviewStatus.textContent = "Overview loaded from the running API. Inactive modules require separately configured services/data.";
+        } catch (error) {
+          overviewStatus.dataset.state = "error";
+          overviewStatus.textContent = error.message || "Could not load the overview.";
+        } finally {
+          overviewButton.disabled = false;
+        }
+      });
+
       async function checkHealth() {
         try {
           const response = await fetch("/health");
@@ -294,7 +545,9 @@
       }
 
       function renderResponse(data) {
+        lastResponse = data;
         resultCard.hidden = false;
+        feedbackCard.hidden = !data.request_id;
         const status = data.status || "UNKNOWN";
         const statusBadge = byId("result-status");
         statusBadge.textContent = status;
@@ -330,8 +583,14 @@
           byId("evidence"),
           data.evidence,
           (item) => item.chunk_text,
-          item.citation_id || item.document_id
+          (item) => item.citation_id || item.document_id
         );
+        const conflictStatus = data.conflicts && data.conflicts.status;
+        byId("conflict-summary").textContent = conflictStatus === "CONFLICTING_EVIDENCE"
+          ? "Conflicting ICR/ISR statements were preserved. Human review is required; neither source was silently preferred."
+          : conflictStatus
+            ? "Conflict check: " + conflictStatus.replaceAll("_", " ").toLowerCase() + "."
+            : "No conflict metadata was returned.";
         resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
@@ -343,16 +602,40 @@
         submitButton.textContent = "Asking…";
         try {
           const token = byId("token").value.trim();
+          const contextValues = {
+            country_code: byId("context-country").value.trim(),
+            sector_code: byId("context-sector").value.trim(),
+            project_year: byId("context-year").value.trim(),
+            planned_days: byId("context-days").value.trim()
+          };
+          const hasContext = Object.values(contextValues).some(Boolean) ||
+            byId("context-method").value.trim();
+          let packageContext;
+          if (hasContext) {
+            if (Object.values(contextValues).some((value) => !value)) {
+              throw new Error("For new-package context, provide country, sector, project year, and planned days.");
+            }
+            packageContext = {
+              country_code: contextValues.country_code,
+              sector_code: contextValues.sector_code,
+              project_year: Number(contextValues.project_year),
+              planned_days: Number(contextValues.planned_days)
+            };
+            const method = byId("context-method").value.trim();
+            if (method) packageContext.procurement_method = method;
+          }
+          const body = {
+            project_id: byId("project-id").value.trim(),
+            question: byId("question").value.trim()
+          };
+          if (packageContext) body.package_context = packageContext;
           const response = await fetch("/v1/query", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               "Authorization": "Bearer " + token
             },
-            body: JSON.stringify({
-              project_id: byId("project-id").value.trim(),
-              question: byId("question").value.trim()
-            })
+            body: JSON.stringify(body)
           });
           const data = await response.json();
           if (!response.ok) {
@@ -370,6 +653,36 @@
         } finally {
           submitButton.disabled = false;
           submitButton.textContent = "Ask question";
+        }
+      });
+
+      byId("feedback-button").addEventListener("click", async () => {
+        const feedbackStatus = byId("feedback-status");
+        const button = byId("feedback-button");
+        feedbackStatus.dataset.state = "";
+        feedbackStatus.textContent = "";
+        if (!lastResponse || !lastResponse.request_id) {
+          feedbackStatus.dataset.state = "error";
+          feedbackStatus.textContent = "Ask a question before submitting feedback.";
+          return;
+        }
+        button.disabled = true;
+        try {
+          const result = await authorizedFetch("/v1/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              request_id: lastResponse.request_id,
+              rating: Number(byId("feedback-rating").value),
+              comment: byId("feedback-comment").value.trim() || null
+            })
+          });
+          feedbackStatus.textContent = "Feedback recorded for human review (" + result.feedback_id + "). It is not a training label.";
+        } catch (error) {
+          feedbackStatus.dataset.state = "error";
+          feedbackStatus.textContent = error.message || "Could not record feedback.";
+        } finally {
+          button.disabled = false;
         }
       });
 

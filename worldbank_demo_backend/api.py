@@ -21,6 +21,7 @@ from .governance import (
     authorize_project,
     load_demo_principals,
 )
+from .demo_overview import build_demo_overview
 from .observability import emit_event
 from .service import ProcurementService
 
@@ -154,6 +155,21 @@ def analytics(
         return service.analytics()
     except PermissionError as exc:
         emit_event("authorization_denied", subject=principal.subject, action="analytics")
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+
+
+@app.get("/v1/demo/overview")
+def demo_overview(
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+) -> dict[str, Any]:
+    principal = _principal(credentials)
+    try:
+        authorize_analytics(principal)
+        service: ProcurementService = request.app.state.service
+        return build_demo_overview(service)
+    except PermissionError as exc:
+        emit_event("authorization_denied", subject=principal.subject, action="demo_overview")
         raise HTTPException(status_code=403, detail=str(exc)) from exc
 
 
